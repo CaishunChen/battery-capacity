@@ -1,0 +1,8 @@
+.DS_Store
+
+# Python stuff.
+*.pyc
+
+# R stuff.
+.RData
+.Rhistory
