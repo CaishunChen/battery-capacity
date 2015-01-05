@@ -11,9 +11,9 @@ def parse_csv(filename, current, cutoff = 0.8):
     with open(filename, "rb") as f:
         reader = csv.reader(f)
         try:
-            for row in reader:
+            for i, row in enumerate(reader):
                 voltage = float(row[2])
-                mah.append(current * (float(row[0]) / 3600))
+                mah.append(current * (float(i) / 3600))
                 volts.append(voltage)
 
                 if (voltage < cutoff):
@@ -25,17 +25,31 @@ def parse_csv(filename, current, cutoff = 0.8):
 
 if __name__ == "__main__":
     batteries = []
+    batt_type = "9V"
+    data_dir = "data/" + batt_type + "/"
 
     # Populate the data.
-    data_dir = "data/AA/"
-    batteries.append({ "name": "MOX \"3600mAh\"",
-        "data": parse_csv(data_dir + "MOX-AA-3600mAh-Discharge.log", 200) })
-    batteries.append({ "name": "Panasonic Platinum Power",
-        "data": parse_csv(data_dir + "Panasonic-PlatinumPower-AA-0124.log", 200) })
-    #batteries.append({ "name": "Panasonic SuperHyper",
-    #    "data": parse_csv(data_dir + "Panasonic-SuperHyper-AA-1116.log", 200) })
-    batteries.append({ "name": "Rontek 1800mAh",
-        "data": parse_csv(data_dir + "Rontek-1800mAh-AA.log", 202) })
+    if batt_type is "AA":
+        batteries.append({ "name": "MOX \"3600mAh\"",
+            "data": parse_csv(data_dir + "MOX-AA-3600mAh-Discharge.log", 200) })
+        batteries.append({ "name": "Panasonic Platinum Power",
+            "data": parse_csv(data_dir + "Panasonic-PlatinumPower-AA-0124.log", 200) })
+        #batteries.append({ "name": "Panasonic SuperHyper",
+        #    "data": parse_csv(data_dir + "Panasonic-SuperHyper-AA-1116.log", 200) })
+        batteries.append({ "name": "Rontek 1800mAh",
+            "data": parse_csv(data_dir + "Rontek-1800mAh-AA.log", 202) })
+        #batteries.append({ "name": "Sony Cyber-shot (Old) 2100mAh",
+        #    "data": parse_csv(data_dir + "Sony-CyberShot-Old-2100mAh.log", 201) })
+    elif batt_type is "AAA":
+        batteries.append({ "name": "AmazonBasics 800mAh",
+            "data": parse_csv(data_dir + "AmazonBasics-AAA-800mAh-100mA.log", 100) })
+    elif batt_type is "9V":
+        batteries.append({ "name": "Rayovac 8.4V 200mAh",
+            "data": parse_csv(data_dir + "Rayovac-RechargePlus-8.4V-200mAh.log", 30) })
+        #batteries.append({ "name": "Rayovac 8.4V 200mAh (Not Charged)",
+        #    "data": parse_csv(data_dir + "Rayovac-RechargePlus-8.4V-200mAh-NotCharged.log", 30) })
+        batteries.append({ "name": "Hi-Watt General Purpose",
+            "data": parse_csv(data_dir + "Hi-Watt-6F22.log", 20) })
 
     # Prepare the plot.
     matplotlib.pyplot.style.use("ggplot")
@@ -44,7 +58,7 @@ if __name__ == "__main__":
         matplotlib.pyplot.plot(batt["data"]["mah"], batt["data"]["volts"], label = batt["name"])
 
     # Setup the plot.
-    matplotlib.pyplot.title("AA Battery Discharge at 200mA")
+    matplotlib.pyplot.title(batt_type + " Battery Discharge")
     matplotlib.pyplot.legend(loc = "upper right")
     matplotlib.pyplot.xlabel("Capacity (mAh)")
     matplotlib.pyplot.ylabel("Voltage (V)")
