@@ -1,0 +1,2 @@
+show,brand,model,voltage,exp_capacity,current,type,cutoff,file,comment,
+1,AmazonBasics,,1.2,800,100,NiMH,0.8,AmazonBasics-AAA-800mAh-100mA.log,,
