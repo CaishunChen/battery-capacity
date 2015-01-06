@@ -1,4 +1,5 @@
 show,brand,model,voltage,exp_capacity,current,type,cutoff,file,comment,
-1,Rayovac,Recharge Plus,8.4,200,30,NiMH,0.8,Rayovac-RechargePlus-8.4V-200mAh.log,,
-0,Rayovac,Recharge Plus,8.4,200,30,NiMH,0.8,Rayovac-RechargePlus-8.4V-200mAh-NotCharged.log,Not fully charged,
-0,Hi-Watt,General Purpose,9,,20,6F22,0.8,Hi-Watt-6F22.log,Written in the box: 20131010-20131025,
+1,Rayovac,Recharge Plus,8.4,200,30,NiMH,6,Rayovac-RechargePlus-8.4V-200mAh.log,,
+0,Rayovac,Recharge Plus,8.4,200,30,NiMH,6,Rayovac-RechargePlus-8.4V-200mAh-NotCharged.log,Not fully charged,
+1,Hi-Watt,General Purpose,9,,20,6F22,6,Hi-Watt-6F22.log,Written in the box: 20131010-20131025,
+1,Powerex,,8.4,300,30,NiMH,6,Powerex-8.4V-300mAh.log,,

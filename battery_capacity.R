@@ -82,5 +82,5 @@ get_batteries <- function (type) {
   return(batts)
 }
 
-batteries <- get_batteries("AA")
+batteries <- get_batteries("9V")
 plot_mah(batteries)
