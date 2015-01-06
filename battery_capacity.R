@@ -71,7 +71,7 @@ get_batteries <- function (type) {
         capacity = ""
       }
       
-      name = sprintf("%s%s %sV%s", battery$brand, model, battery$voltage, capacity)
+      name = sprintf("%s%s %sV%s @ %smA", battery$brand, model, battery$voltage, capacity, battery$current)
       batts[[length(batts) + 1]] = battery_discharge(name,
                                                      paste(type, battery$file, sep = "/"),
                                                      battery$current,
