@@ -5,7 +5,7 @@
 
 library("ggplot2")
 library("scales")
-setwd("~/Developer/Statistics/data/Battery-Capacity/data")
+setwd("~/Developer/Statistics/Battery-Capacity/data")
 rm(list = ls(all = TRUE))  # Clear the workspace.
 
 # Get the battery discharge data from the CSV file.

@@ -8,5 +8,5 @@ Just logging battery capacity.
 
 ## 9V
 
-![9V Discharge](http://i.imgur.com/WMBKtMV.png)
+![9V Discharge](http://i.imgur.com/GJLQqnI.png)
 
