@@ -61,8 +61,10 @@ get_batteries <- function (type) {
       model = battery$model
       capacity = battery$exp_capacity
       
-      if (model != "") {
-        model = paste0(" ", model)
+      if (!is.na(model)) {
+        if (model != "") {
+          model = paste0(" ", model)
+        }
       }
       
       if (!is.na(capacity)) {
