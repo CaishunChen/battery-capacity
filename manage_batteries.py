@@ -5,6 +5,7 @@ import os
 import csv
 import cmd
 from pprint import pprint
+from termcolor import colored
 
 DATA_DIR = "data/"
 
@@ -35,7 +36,11 @@ class Cmdline(cmd.Cmd):
             self.do_type("list")
         else:
             for i,battery in enumerate(parse_index(self.type_selected)):
-                print "%d. %s %s %.1fV %s (%s)" % (i, battery["brand"], battery["model"], battery["voltage"], battery["type"], battery["file"])
+                color = "red"
+                if battery["show"]:
+                    color = "blue"
+
+                print colored("%d. %s %s %.1fV %s (%s)", color) % (i, battery["brand"], battery["model"], battery["voltage"], battery["type"], battery["file"])
 
     def do_exit(self, line):
         exit()
@@ -66,8 +71,12 @@ def parse_index(battery_type):
                     if row[4] != "":
                         exp_capacity = int(row[4])
 
+                    show = False
+                    if row[0] == "1":
+                        show = True
+
                     batteries.append({
-                        "show": row[0],
+                        "show": show,
                         "brand": row[1],
                         "model": row[2],
                         "voltage": float(row[3]),
