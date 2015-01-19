@@ -1,5 +1,5 @@
-#' battery_capacity.R
-#' Plots and analyzes battery capacity.
+#' server.R
+#' Shiny server.
 #' 
 #' @author Nathan Campos <nathanpc@dreamintech.net>
 
@@ -7,14 +7,13 @@ library("ggplot2")
 library("scales")
 library("shiny")
 setwd("~/Developer/Statistics/Battery-Capacity/data")
-rm(list = ls(all = TRUE))  # Clear the workspace.
 
 # Get the battery discharge data from the CSV file.
 battery_discharge <- function (name, csvfile, current, cutoff) {
   csv = read.csv(csvfile, header = FALSE)
   volts = csv[[3]]
   mah = c()
-
+  
   for (i in 0:(length(volts) - 1)) {
     mah = c(mah, current * (i / 3600))
     
@@ -34,12 +33,12 @@ plot_mah <- function (batts) {
   graph = graph + theme(legend.title = element_blank(),
                         legend.justification = c(1, 1),
                         legend.position = c(1, 1))
-
+  
   for (i in 1:length(batteries)) {
     graph = graph + geom_line(data = batts[[i]],
                               aes(x = mah, y = voltage, color = name))
   }
-
+  
   # Setup labels and etc.
   graph = graph + scale_x_continuous("Capacity (mAh)",
                                      breaks = pretty_breaks(n = 10))
@@ -85,6 +84,23 @@ get_batteries <- function (type) {
   return(batts)
 }
 
-batteries <- get_batteries("9V")
-plot_mah(batteries)
-runApp("../web")
+# Define server logic required to draw a histogram
+shinyServer(function(input, output) {
+  
+  # Expression that generates a histogram. The expression is
+  # wrapped in a call to renderPlot to indicate that:
+  #
+  #  1) It is "reactive" and therefore should re-execute automatically
+  #     when inputs change
+  #  2) Its output type is a plot
+  
+  output$distPlot <- renderPlot({
+    #x    <- faithful[, 2]  # Old Faithful Geyser data
+    #bins <- seq(min(x), max(x), length.out = input$bins + 1)
+    
+    # draw the histogram with the specified number of bins
+    #hist(x, breaks = bins, col = 'darkgray', border = 'white')
+    batteries <- get_batteries("9V")
+    plot_mah(batteries)
+  })
+})
