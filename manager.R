@@ -7,7 +7,7 @@ library("shiny")
 source("battery_capacity.R")
 
 run <- function () {
-  runApp("web")
+  runApp(".")
 }
 
 run()
