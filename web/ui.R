@@ -5,25 +5,27 @@
 
 library("shiny")
 
-# Define UI for application that draws a histogram
 shinyUI(fluidPage(
-  
-  # Application title
-  titlePanel("Hello Shiny!"),
-  
-  # Sidebar with a slider input for the number of bins
-  sidebarLayout(
-    sidebarPanel(
-      sliderInput("bins",
-                  "Number of bins:",
-                  min = 1,
-                  max = 50,
-                  value = 30)
+  title = "Battery Capacity",
+  plotOutput("plot"),
+  hr(),
+  fluidRow(
+    column(3,
+      selectInput("batt_type", h4("Battery Type"), list("9V", "AA"))
     ),
-    
-    # Show a plot of the generated distribution
-    mainPanel(
-      plotOutput("distPlot")
+    column(7,
+      checkboxGroupInput("batteries", h4("Batteries"), 
+                         choices = list("Choice 1" = 1, "Choice 2" = 2, "Choice 3" = 3),
+                         selected = list(1,3))
     )
   )
+  #sidebarLayout(position = "right",
+  #  sidebarPanel(
+  #    sliderInput("bins",
+  #                "Number of bins:",
+  #                min = 1,
+  #                max = 50,
+  #                value = 30)
+  #  ),
+  #)
 ))

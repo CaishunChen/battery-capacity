@@ -5,9 +5,8 @@
 
 library("ggplot2")
 library("scales")
-library("shiny")
-setwd("~/Developer/Statistics/Battery-Capacity/data")
 rm(list = ls(all = TRUE))  # Clear the workspace.
+datadir <- "data"
 
 # Get the battery discharge data from the CSV file.
 battery_discharge <- function (name, csvfile, current, cutoff) {
@@ -35,7 +34,7 @@ plot_mah <- function (batts) {
                         legend.justification = c(1, 1),
                         legend.position = c(1, 1))
 
-  for (i in 1:length(batteries)) {
+  for (i in 1:length(batts)) {
     graph = graph + geom_line(data = batts[[i]],
                               aes(x = mah, y = voltage, color = name))
   }
@@ -52,7 +51,7 @@ plot_mah <- function (batts) {
 
 # Get batteries by type.
 get_batteries <- function (type) {
-  csv = read.csv(paste(type, "index.csv", sep = "/"))
+  csv = read.csv(paste(datadir, type, "index.csv", sep = "/"))
   batts = list()
   
   for (i in 1:nrow(csv)) {
@@ -76,7 +75,7 @@ get_batteries <- function (type) {
       
       name = sprintf("%s%s %sV%s @ %smA", battery$brand, model, battery$voltage, capacity, battery$current)
       batts[[length(batts) + 1]] = battery_discharge(name,
-                                                     paste(type, battery$file, sep = "/"),
+                                                     paste(datadir, type, battery$file, sep = "/"),
                                                      battery$current,
                                                      battery$cutoff)
     }
@@ -84,7 +83,3 @@ get_batteries <- function (type) {
   
   return(batts)
 }
-
-batteries <- get_batteries("9V")
-plot_mah(batteries)
-runApp("../web")
