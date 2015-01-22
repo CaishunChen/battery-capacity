@@ -6,6 +6,9 @@
 library("shiny")
 source("battery_capacity.R")
 
+#' Gets a list of batteries to populate the CheckboxGroupInput.
+#' 
+#' @param type Battery type.
 battery_list <- function (type) {
   csv = read.csv(paste(datadir, type, "index.csv", sep = "/"))
   names = list()
@@ -38,8 +41,7 @@ battery_list <- function (type) {
   return(list(names = names, files = files, selected = list(1:length(names))))
 }
 
-
-
+# Shiny UI.
 ui <- shinyUI(fluidPage(
   title = "Battery Capacity",
   plotOutput("plot"),
@@ -54,6 +56,7 @@ ui <- shinyUI(fluidPage(
   )
 ))
 
+# Shiny server.
 server <- shinyServer(function(input, output, session) {
   observe({
     batt_list = battery_list(input$batt_type)
