@@ -77,8 +77,9 @@ get_batteries <- function (type) {
 #' Plots the capacity of the batteries.
 #' 
 #' @param batts Battery data from `get_batteries`
+#' @param show Vector with the batteries (index in batts) to be shown in the graph.
 #' @seealso get_batteries
-plot_mah <- function (batts, show) {
+plot_mah <- function (batts, show = 1:length(batts)) {
   graph = ggplot()
   graph = graph + scale_colour_brewer(palette="Set1")
   graph = graph + theme(legend.title = element_blank(),
