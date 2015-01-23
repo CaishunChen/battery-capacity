@@ -33,12 +33,13 @@ battery_list <- function (type) {
         capacity = ""
       }
       
-      names[[length(names) + 1]] = sprintf("%s%s %sV%s @ %smA", battery$brand, model, battery$voltage, capacity, battery$current)
+      names[[sprintf("%s%s %sV%s @ %smA", battery$brand, model, battery$voltage, capacity, battery$current)]] = length(names) + 1
       files[[length(files) + 1]] = paste(datadir, type, battery$file, sep = "/")
     }
   }
   
-  return(list(names = names, files = files, selected = list(1:length(names))))
+  return(list(names = names, files = files,
+              selected = as.character(1:length(names))))
 }
 
 # Shiny UI.
@@ -58,17 +59,24 @@ ui <- shinyUI(fluidPage(
 
 # Shiny server.
 server <- shinyServer(function(input, output, session) {
-  observe({
+  batt_list = reactive(battery_list(input$batt_type))
+  batteries = reactive(get_batteries(input$batt_type))
+
+  observeEvent(input$batteries, {
+    show = as.numeric(input$batteries)
+    
+    output$plot <- renderPlot({
+      plot_mah(batteries(), show)
+    })
+  })
+  
+  observeEvent(input$batt_type, {
     batt_list = battery_list(input$batt_type)
     batteries = get_batteries(input$batt_type)
 
     updateCheckboxGroupInput(session, "batteries",
                              choices = batt_list[["names"]],
-                             selected = batt_list$names[unlist(batt_list[["selected"]])])
-    
-    output$plot <- renderPlot({
-      plot_mah(batteries)
-    })
+                             selected = batt_list[["selected"]])
   })
 })
 

@@ -78,7 +78,7 @@ get_batteries <- function (type) {
 #' 
 #' @param batts Battery data from `get_batteries`
 #' @seealso get_batteries
-plot_mah <- function (batts) {
+plot_mah <- function (batts, show) {
   graph = ggplot()
   graph = graph + scale_colour_brewer(palette="Set1")
   graph = graph + theme(legend.title = element_blank(),
@@ -87,15 +87,19 @@ plot_mah <- function (batts) {
   
   # Add the lines for each battery.
   for (i in 1:length(batts)) {
-    graph = graph + geom_line(data = batts[[i]],
-                              aes(x = mah, y = voltage, color = name))
+    for (j in 1:length(show)) {
+      if (i == show[j]) {
+        graph = graph + geom_line(data = batts[[i]],
+                                  aes(x = mah, y = voltage, color = name))
+      }
+    }
   }
 
   # Setup labels and etc.
   graph = graph + scale_x_continuous("Capacity (mAh)",
-                                     breaks = pretty_breaks(n = 10))
+                                     breaks = pretty_breaks(n = 15))
   graph = graph + scale_y_continuous("Voltage (V)",
-                                     breaks = pretty_breaks(n = 10))
+                                     breaks = pretty_breaks(n = 15))
   
   # Plot the data.
   print(graph)
