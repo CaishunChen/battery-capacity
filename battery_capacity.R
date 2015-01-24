@@ -7,6 +7,7 @@ library("ggplot2")
 library("scales")
 rm(list = ls(all = TRUE))  # Clear the workspace.
 datadir <- "data"
+cachedir = "cache"
 
 #' Get the battery discharge data from the log file.
 #' 
@@ -37,37 +38,42 @@ battery_discharge <- function (name, file, current, cutoff) {
 #' Get batteries data by type.
 #' 
 #' @param type Battery type.
+#' @param cached Get the data from the cache or from the raw data dir.
 #' @return A list with the data frames from `battery_discharge`
 #' @seealso battery_discharge
-get_batteries <- function (type) {
-  csv = read.csv(paste(datadir, type, "index.csv", sep = "/"))
+get_batteries <- function (type, cached = TRUE) {
   batts = list()
   
-  for (i in 1:nrow(csv)) {
-    battery = csv[i,]
-    
-    if (battery$show == 1) {
-      model = battery$model
-      capacity = battery$exp_capacity
+  if (cached) {
+    batts = readRDS(paste0(cachedir, "/", type, ".rds"))
+  } else {
+    csv = read.csv(paste(datadir, type, "index.csv", sep = "/"))
+    for (i in 1:nrow(csv)) {
+      battery = csv[i,]
       
-      if (!is.na(model)) {
-        if (model != "") {
-          model = paste0(" ", model)
+      if (battery$show == 1) {
+        model = battery$model
+        capacity = battery$exp_capacity
+        
+        if (!is.na(model)) {
+          if (model != "") {
+            model = paste0(" ", model)
+          }
         }
+        
+        if (!is.na(capacity)) {
+          capacity = sprintf(" %smAh", capacity)
+        } else {
+          capacity = ""
+        }
+        
+        # Create the name string and append the data to it.
+        name = sprintf("%s%s %sV%s @ %smA", battery$brand, model, battery$voltage, capacity, battery$current)
+        batts[[length(batts) + 1]] = battery_discharge(name,
+                                                       paste(datadir, type, battery$file, sep = "/"),
+                                                       battery$current,
+                                                       battery$cutoff)
       }
-      
-      if (!is.na(capacity)) {
-        capacity = sprintf(" %smAh", capacity)
-      } else {
-        capacity = ""
-      }
-      
-      # Create the name string and append the data to it.
-      name = sprintf("%s%s %sV%s @ %smA", battery$brand, model, battery$voltage, capacity, battery$current)
-      batts[[length(batts) + 1]] = battery_discharge(name,
-                                                     paste(datadir, type, battery$file, sep = "/"),
-                                                     battery$current,
-                                                     battery$cutoff)
     }
   }
   
@@ -105,3 +111,5 @@ plot_mah <- function (batts, show = 1:length(batts)) {
   # Plot the data.
   print(graph)
 }
+
+

@@ -49,7 +49,7 @@ ui <- shinyUI(fluidPage(
   hr(),
   fluidRow(
     column(3,
-           selectInput("batt_type", h4("Battery Type"), as.list(list.dirs("data", recursive = FALSE, full.names = FALSE)))
+           selectInput("batt_type", h4("Battery Type"), as.list(list.dirs(datadir, recursive = FALSE, full.names = FALSE)))
     ),
     column(7,
            checkboxGroupInput("batteries", h4("Batteries"), choices = list("Nothing"))

@@ -7,3 +7,9 @@
 .RData
 .Rhistory
 .Rproj.user
+*.rds
+cache/
+
+# C Stuff.
+*.o
+battery_capacity
