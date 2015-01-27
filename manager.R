@@ -3,9 +3,11 @@
 #' 
 #' @author Nathan Campos <nathanpc@dreamintech.net>
 
-library("shiny")
 source("battery_capacity.R")
 
+#' Builds the cache to speed things up.
+#' 
+#' @param max_points Maximum number of points to be used to simplify the dataset.
 build_cache <- function (max_points = 200) {
   types = list.dirs(datadir, recursive = FALSE, full.names = FALSE)
   for (i in 1:length(types)) {
@@ -42,7 +44,10 @@ simplify_data <- function (battery, max_points = 200) {
   return(data.frame(voltage = volts, mah = mah, name = battery[["name"]][1]))
 }
 
-#' Start the Shiny server.
-run <- function () {
-  runApp(".")
+#' Plots the batteries.
+#' 
+#' @param type Type of battery to plot.
+plot_battery <- (type) {
+  batteries = get_batteries(type)
+  plot_mah(batteries)
 }
