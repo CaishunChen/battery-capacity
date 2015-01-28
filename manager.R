@@ -10,15 +10,25 @@ source("battery_capacity.R")
 #' @param max_points Maximum number of points to be used to simplify the dataset.
 build_cache <- function (max_points = 200) {
   types = list.dirs(datadir, recursive = FALSE, full.names = FALSE)
+  cat("Building cache for the following battery types: ")
+  cat(types)
+  cat("\n")
+  
   for (i in 1:length(types)) {
+    cat(sprintf("Type: %s\n", types[i]))
     batteries = get_batteries(types[i], FALSE)
     
     for (j in 1:length(batteries)) {
+      cat(sprintf("Simplifying the dataset for %s\n", as.character(batteries[[j]][["name"]][1])))
       batteries[[j]] = simplify_data(batteries[[j]], max_points)
     }
 
-    saveRDS(batteries, paste0(cachedir, "/", types[i], ".rds"))
+    filename = paste0(cachedir, "/", types[i], ".rds")
+    cat(sprintf("Saving cache to %s\n", filename))
+    saveRDS(batteries, filename)
   }
+  
+  cat("Finished building the cache.\n")
 }
 
 #' Simplifies a dataset to make it easier for ggplot2 to plot the data.
