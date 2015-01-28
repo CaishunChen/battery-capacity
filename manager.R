@@ -47,7 +47,7 @@ simplify_data <- function (battery, max_points = 200) {
 #' Plots the batteries.
 #' 
 #' @param type Type of battery to plot.
-plot_battery <- (type) {
+plot_battery <- function (type) {
   batteries = get_batteries(type)
   plot_mah(batteries)
 }
