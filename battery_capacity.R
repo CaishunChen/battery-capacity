@@ -112,4 +112,15 @@ plot_mah <- function (batts, show = 1:length(batts)) {
   print(graph)
 }
 
+#' A shorthand for plot_mah(get_batteries(type, cached)).
+#'
+#' @param type Battery type.
+#' @param cached Get the data from the cache or from the raw data dir.
+plot_batteries <- function (type, cached = TRUE) {
+  plot_mah(get_batteries(type, cached))
+}
 
+list_capacity <- function (type, cutoff = NULL) {
+  prevmah = 0
+  mah = 0
+}

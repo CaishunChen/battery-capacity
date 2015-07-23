@@ -3,11 +3,26 @@
 import sys
 import csv
 import matplotlib.pyplot
-from pprint import pprint
 
 # Constants
 DATADIR = "data/"
 
+# Build a name to be displayed in the legend.
+def build_name(batt):
+    name = batt["brand"]
+
+    if batt["model"] != "":
+        name += " " + batt["model"]
+    
+    name += " " + str(batt["voltage"]) + "V"
+
+    if batt["exp_capacity"] > 0:
+        name += " " + str(batt["exp_capacity"]) + "mAh"
+
+    name += " @ " + str(batt["current"]) + "mA"
+    return name
+
+# Parse the battery index.
 def parse_index(btype):
     index = []
     bdir = DATADIR + btype + "/"
@@ -38,6 +53,7 @@ def parse_index(btype):
 
     return index
 
+# Parse the battery log data.
 def parse_battery(filename, current, cutoff = 0.8):
     mah = []
     volts = []
@@ -64,13 +80,14 @@ def get_batteries(btype):
 
     for battery in index:
         if battery["show"]:
-            batteries.append({ "name": battery["brand"] + " " + battery["model"],
+            batteries.append({ "name": build_name(battery),
                 "data": parse_battery(bdir + battery["file"], battery["current"], battery["cutoff"]) })
 
     return batteries
 
-if __name__ == "__main__":
-    batteries = get_batteries("9V")
+# Plot the capacity of the battery.
+def plot(btype):
+    batteries = get_batteries(btype)
 
     # Prepare the plot.
     matplotlib.pyplot.style.use("ggplot")
@@ -79,10 +96,14 @@ if __name__ == "__main__":
         matplotlib.pyplot.plot(batt["data"]["mah"], batt["data"]["volts"], label = batt["name"])
 
     # Setup the plot.
-    matplotlib.pyplot.title("Battery Discharge")
+    matplotlib.pyplot.title(btype + " Battery Discharge")
     matplotlib.pyplot.legend(loc = "upper right")
     matplotlib.pyplot.xlabel("Capacity (mAh)")
     matplotlib.pyplot.ylabel("Voltage (V)")
     matplotlib.pyplot.grid(True)
+    matplotlib.pyplot.tight_layout()
     matplotlib.pyplot.show()
 
+# Execute program.
+if __name__ == "__main__":
+    plot("9V")

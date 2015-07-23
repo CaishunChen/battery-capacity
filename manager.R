@@ -61,3 +61,48 @@ plot_battery <- function (type) {
   batteries = get_batteries(type)
   plot_mah(batteries)
 }
+
+#' Adds a battery to the index.
+#' 
+#' @param type Battery type.
+#' @param brand Battery brand.
+#' @param model Battery model.
+#' @param voltage Nominal voltage.
+#' @param exp_capacity Expected capacity.
+#' @param current Discharge current.
+#' @param chemistry Battery chemistry.
+#' @param cutoff Voltage cutoff.
+#' @param file File where the logged data is stored.
+#' @param comment Any comments about the battery.
+add_battery <- function (type, brand = "", model = "", voltage = "",
+                         exp_capacity = "", current = "", chemistry = "",
+                         cutoff = "", file = "", comment = "") {
+  # TODO: Check if the directory exists.
+  if (brand == "") {
+    # Interactive mode.
+    brand = readline("Brand: ")
+    model = readline("Model: ")
+    voltage = readline("Nominal Voltage (V): ")
+    exp_capacity = readline("Expected Capacity (mAh): ")
+    current = readline("Discharge Current (mA): ")
+    chemistry = readline("Chemistry: ")
+    cutoff = readline("Voltage Cutoff (V): ")
+    
+    sample_file = ""
+    if (model != "")
+      sample_file = gsub(" ", "", sprintf("-%s", model))
+    sample_file = sprintf("%s%s-%sV-%smAh.csv", brand, sample_file, voltage, exp_capacity)
+    
+    file = readline(sprintf("File (%s): ", sample_file))
+    if (file == "") {
+      file = sample_file
+    }
+    
+    comment = readline("Comment: ")
+  }
+  
+  line = sprintf("1,%s,%s,%s,%s,%s,%s,%s,%s,%s,", brand, model, voltage, exp_capacity, current, chemistry, cutoff, file, comment)
+  print(line)
+  # TODO: Append to file.
+  # TODO: Add option to build cache.
+}
