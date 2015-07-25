@@ -11,7 +11,7 @@ DATADIR = "data/"
 def build_name(batt):
     name = batt["brand"]
 
-    if batt["model"] != "":
+    if batt["model"] != "NA":
         name += " " + batt["model"]
     
     name += " " + str(batt["voltage"]) + "V"
@@ -33,7 +33,7 @@ def parse_index(btype):
             for i, row in enumerate(reader):
                 if i > 0:
                     expcap = 0
-                    if row[4] != "":
+                    if row[4] != "NA":
                         expcap = int(row[4])
 
                     index.append({
