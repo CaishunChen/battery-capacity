@@ -15,6 +15,7 @@
 #define INDEXFILE "index.csv"
 
 size_t countlines(const char *filename);
+char* battery_label(struct battery batt);
 struct battery create_battery(char *col[10]);
 size_t battery_index(struct battery **index, const char *type);
 
@@ -31,12 +32,14 @@ struct battery {
 	char *comment;
 };
 
+
 int main(int argc, const char *argv[]) {
 	struct battery *batteries;
 	size_t nitems = battery_index(&batteries, "9V");
 
 	for (int i = 0; i < nitems; i++) {
-		printf("%s %s %.1fV\n", batteries[i].brand, batteries[i].model, batteries[i].voltage);
+		printf("%s\n", battery_label(batteries[i]));
+		//printf("%s %s %.1fV\n", batteries[i].brand, batteries[i].model, batteries[i].voltage);
 		printf("%s\n\n", batteries[i].file);
 	}
 
@@ -65,6 +68,36 @@ size_t countlines(const char *filename) {
 }
 
 /**
+ * Generates a pretty label to indicate all the parameters of the battery.
+ *
+ * @param batt A battery struct.
+ * @return The battery label.
+ */
+char* battery_label(struct battery batt) {
+	char *model = "";
+	char *exp_capacity = "";
+	size_t bsize = 0;
+
+	if (batt.model != NULL) {
+		bsize = snprintf(NULL, 0, " %s", batt.model) + 1;
+		model = malloc(bsize);
+		snprintf(model, bsize, " %s", batt.model);
+	}
+
+	if (batt.exp_capacity != 0) {
+		bsize = snprintf(NULL, 0, " %dmAh", batt.exp_capacity) + 1;
+		exp_capacity = malloc(bsize);
+		snprintf(exp_capacity, bsize, " %dmAh", batt.exp_capacity);
+	}
+
+	bsize = snprintf(NULL, 0, "%s%s %.1fV%s @ %dmA", batt.brand, model, batt.voltage, exp_capacity, batt.current) + 1;
+	char *label = malloc(bsize);
+	snprintf(label, bsize, "%s%s %.1fV%s @ %dmA", batt.brand, model, batt.voltage, exp_capacity, batt.current);
+
+	return label;
+}
+
+/**
  * Creates a battery struct with the contents from the array of columns.
  *
  * @param col Array of columns.
@@ -76,8 +109,6 @@ struct battery create_battery(char *col[10]) {
 	batt.show = atoi(col[0]);
 	batt.brand = (char *)malloc(sizeof(char) * strlen(col[1]));
 	strcpy(batt.brand, col[1]);
-	batt.model = (char *)malloc(sizeof(char) * strlen(col[2]));
-	strcpy(batt.model, col[2]);  // TODO: If NA then NULL.
 	batt.voltage = atof(col[3]);
 	batt.current = atoi(col[5]);
 	batt.type = (char *)malloc(sizeof(char) * strlen(col[6]));
@@ -85,14 +116,27 @@ struct battery create_battery(char *col[10]) {
 	batt.cutoff = atof(col[7]);
 	batt.file = (char *)malloc(sizeof(char) * strlen(col[8]));
 	strcpy(batt.file, col[8]);
-	batt.comment = (char *)malloc(sizeof(char) * strlen(col[9]));
-	strcpy(batt.comment, col[9]);
+	
+	if (strcmp(col[2], "NA") != 0) {
+		batt.model = (char *)malloc(sizeof(char) * strlen(col[2]));
+		strcpy(batt.model, col[2]);
+	} else {
+		batt.model = NULL;
+	}
 
 	unsigned int exp_capacity = 0;
 	if (strcmp(col[4], "NA") != 0) {
 		exp_capacity = atoi(col[4]);
 	}
 	batt.exp_capacity = exp_capacity;
+
+	if (strcmp(col[9], "NA") != 0) {
+		batt.comment = (char *)malloc(sizeof(char) * strlen(col[9]));
+		strcpy(batt.comment, col[9]);
+	} else {
+		batt.comment = NULL;
+	}
+
 
 	return batt;
 }
@@ -158,7 +202,6 @@ size_t battery_index(struct battery **index, const char *type) {
 		items++;
 	}
 
-	//memcpy(index, batteries, sizeof(struct) * sizeof(batteries));
 	*index = batteries;
 	return items;
 }
