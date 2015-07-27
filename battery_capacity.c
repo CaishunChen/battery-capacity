@@ -10,14 +10,10 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+#include "gnuplot_i/gnuplot_i.h"
 
 #define DATADIR "data"
 #define INDEXFILE "index.csv"
-
-size_t countlines(const char *filename);
-char* battery_label(struct battery batt);
-struct battery create_battery(char *col[10]);
-size_t battery_index(struct battery **index, const char *type);
 
 struct battery {
 	bool show;
@@ -32,6 +28,10 @@ struct battery {
 	char *comment;
 };
 
+size_t countlines(const char *filename);
+char* battery_label(struct battery batt);
+struct battery create_battery(char *col[10]);
+size_t battery_index(struct battery **index, const char *type);
 
 int main(int argc, const char *argv[]) {
 	struct battery *batteries;
@@ -166,10 +166,8 @@ size_t battery_index(struct battery **index, const char *type) {
 
 	bool past_header = false;
 	while (getline(&line, &len, csvfile) != -1) {
-		char *value;
 		char *col[10];
 		char *token = NULL;
-		char c;
 		uint8_t cols = 0;
 
 		if (!past_header) {
