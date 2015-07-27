@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <string.h>
+#include <unistd.h>
 #include "gnuplot_i/gnuplot_i.h"
 
 #define DATADIR "data"
@@ -33,7 +34,21 @@ size_t countlines(const char *filename);
 char* battery_label(const struct battery batt);
 struct battery create_battery(char *col[10], const char *type);
 size_t battery_index(struct battery **index, const char *type);
-size_t battery_discharge(const struct battery batt, float **voltages);
+size_t battery_discharge(const struct battery batt, double **voltages);
+
+void plot_battery(gnuplot_ctrl *gp, struct battery batt) {
+	double *voltages;
+	size_t nreads = battery_discharge(batt, &voltages);
+	double *mah;
+	mah = malloc(nreads * sizeof(double));
+
+	for (size_t i = 0; i < nreads; i++) {
+		mah[i] = batt.current * ((double)i / 3600);
+	}
+	
+	gnuplot_setstyle(gp, "lines");
+	gnuplot_plot_xy(gp, mah, voltages, nreads, battery_label(batt));
+}
 
 int main(int argc, const char *argv[]) {
 	struct battery *batteries;
@@ -45,13 +60,17 @@ int main(int argc, const char *argv[]) {
 	}
 
 	printf("%zu lines\n", countlines("data/9V/index.csv"));
-
-	float *voltages;
-	size_t nreads = battery_discharge(batteries[2], &voltages);
-	for (size_t i = 0; i < nreads; i++) {
-		printf("%.3f, ", voltages[i]);
+	
+	gnuplot_ctrl *gp = gnuplot_init();
+	for (int i = 0; i < nitems; i++) {
+		if (batteries[i].show) {
+			plot_battery(gp, batteries[i]);
+		}
 	}
+	sleep(5);
+	gnuplot_close(gp);
 
+	return EXIT_SUCCESS;
 }
 
 /**
@@ -224,18 +243,18 @@ size_t battery_index(struct battery **index, const char *type) {
  * @param voltages The array of voltages.
  * @return Number of voltage readings in the array.
  */
-size_t battery_discharge(const struct battery batt, float **voltages) {
+size_t battery_discharge(const struct battery batt, double **voltages) {
 	FILE *csvfile;
 	char *filename;
 	char *line = NULL;
 	size_t len = 0;
 	size_t items = 0;
-	float *_voltages;
+	double *_voltages;
 
 	size_t bsize = snprintf(NULL, 0, "%s/%s/%s", DATADIR, batt.type, batt.file) + 1;
 	filename = malloc(bsize);
 	snprintf(filename, bsize, "%s/%s/%s", DATADIR, batt.type, batt.file);
-	_voltages = malloc(countlines(filename) * sizeof(float));
+	_voltages = malloc(countlines(filename) * sizeof(double));
 
 	csvfile = fopen(filename, "r");
 	if (csvfile == NULL) {
