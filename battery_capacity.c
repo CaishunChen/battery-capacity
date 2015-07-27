@@ -35,20 +35,7 @@ char* battery_label(const struct battery batt);
 struct battery create_battery(char *col[10], const char *type);
 size_t battery_index(struct battery **index, const char *type);
 size_t battery_discharge(const struct battery batt, double **voltages);
-
-void plot_battery(gnuplot_ctrl *gp, struct battery batt) {
-	double *voltages;
-	size_t nreads = battery_discharge(batt, &voltages);
-	double *mah;
-	mah = malloc(nreads * sizeof(double));
-
-	for (size_t i = 0; i < nreads; i++) {
-		mah[i] = batt.current * ((double)i / 3600);
-	}
-	
-	gnuplot_setstyle(gp, "lines");
-	gnuplot_plot_xy(gp, mah, voltages, nreads, battery_label(batt));
-}
+void plot_battery(gnuplot_ctrl *gp, const struct battery batt); 
 
 int main(int argc, const char *argv[]) {
 	struct battery *batteries;
@@ -62,12 +49,19 @@ int main(int argc, const char *argv[]) {
 	printf("%zu lines\n", countlines("data/9V/index.csv"));
 	
 	gnuplot_ctrl *gp = gnuplot_init();
+	gnuplot_cmd(gp, "load 'gnuplot.cfg'");
+	gnuplot_cmd(gp, "set key on");
+	gnuplot_set_xlabel(gp, "Capacity (mAh)");
+	gnuplot_set_ylabel(gp, "Voltage (V)");
+
 	for (int i = 0; i < nitems; i++) {
 		if (batteries[i].show) {
 			plot_battery(gp, batteries[i]);
 		}
 	}
+
 	sleep(5);
+	//pause();
 	gnuplot_close(gp);
 
 	return EXIT_SUCCESS;
@@ -284,5 +278,19 @@ size_t battery_discharge(const struct battery batt, double **voltages) {
 	*voltages = _voltages;
 	return items;
 
+}
+
+void plot_battery(gnuplot_ctrl *gp, const struct battery batt) {
+	double *voltages;
+	size_t nreads = battery_discharge(batt, &voltages);
+	double *mah;
+	mah = malloc(nreads * sizeof(double));
+
+	for (size_t i = 0; i < nreads; i++) {
+		mah[i] = batt.current * ((double)i / 3600);
+	}
+	
+	gnuplot_setstyle(gp, "lines");
+	gnuplot_plot_xy(gp, mah, voltages, nreads, battery_label(batt));
 }
 
