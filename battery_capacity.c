@@ -16,22 +16,24 @@
 #define INDEXFILE "index.csv"
 
 struct battery {
+	char *type;
 	bool show;
 	char *brand;
 	char *model;
 	double voltage;
 	unsigned int exp_capacity;
 	unsigned int current;
-	char *type;
+	char *chem;
 	float cutoff;
 	char *file;
 	char *comment;
 };
 
 size_t countlines(const char *filename);
-char* battery_label(struct battery batt);
-struct battery create_battery(char *col[10]);
+char* battery_label(const struct battery batt);
+struct battery create_battery(char *col[10], const char *type);
 size_t battery_index(struct battery **index, const char *type);
+size_t battery_discharge(const struct battery batt, float **voltages);
 
 int main(int argc, const char *argv[]) {
 	struct battery *batteries;
@@ -39,11 +41,17 @@ int main(int argc, const char *argv[]) {
 
 	for (int i = 0; i < nitems; i++) {
 		printf("%s\n", battery_label(batteries[i]));
-		//printf("%s %s %.1fV\n", batteries[i].brand, batteries[i].model, batteries[i].voltage);
 		printf("%s\n\n", batteries[i].file);
 	}
 
 	printf("%zu lines\n", countlines("data/9V/index.csv"));
+
+	float *voltages;
+	size_t nreads = battery_discharge(batteries[2], &voltages);
+	for (size_t i = 0; i < nreads; i++) {
+		printf("%.3f, ", voltages[i]);
+	}
+
 }
 
 /**
@@ -73,7 +81,7 @@ size_t countlines(const char *filename) {
  * @param batt A battery struct.
  * @return The battery label.
  */
-char* battery_label(struct battery batt) {
+char* battery_label(const struct battery batt) {
 	char *model = "";
 	char *exp_capacity = "";
 	size_t bsize = 0;
@@ -101,24 +109,27 @@ char* battery_label(struct battery batt) {
  * Creates a battery struct with the contents from the array of columns.
  *
  * @param col Array of columns.
+ * @param type Battery type.
  * @return Battery struct.
  */
-struct battery create_battery(char *col[10]) {
+struct battery create_battery(char *col[10], const char *type) {
 	struct battery batt;
 
+	batt.type = (char *)malloc(sizeof(char) * strlen(type) + 1);
+	strcpy(batt.type, type);
 	batt.show = atoi(col[0]);
-	batt.brand = (char *)malloc(sizeof(char) * strlen(col[1]));
+	batt.brand = (char *)malloc(sizeof(char) * strlen(col[1]) + 1);
 	strcpy(batt.brand, col[1]);
 	batt.voltage = atof(col[3]);
 	batt.current = atoi(col[5]);
-	batt.type = (char *)malloc(sizeof(char) * strlen(col[6]));
-	strcpy(batt.type, col[6]);
+	batt.chem = (char *)malloc(sizeof(char) * strlen(col[6]) + 1);
+	strcpy(batt.chem, col[6]);
 	batt.cutoff = atof(col[7]);
-	batt.file = (char *)malloc(sizeof(char) * strlen(col[8]));
+	batt.file = (char *)malloc(sizeof(char) * strlen(col[8]) + 1);
 	strcpy(batt.file, col[8]);
 	
 	if (strcmp(col[2], "NA") != 0) {
-		batt.model = (char *)malloc(sizeof(char) * strlen(col[2]));
+		batt.model = (char *)malloc(sizeof(char) * strlen(col[2]) + 1);
 		strcpy(batt.model, col[2]);
 	} else {
 		batt.model = NULL;
@@ -131,7 +142,7 @@ struct battery create_battery(char *col[10]) {
 	batt.exp_capacity = exp_capacity;
 
 	if (strcmp(col[9], "NA") != 0) {
-		batt.comment = (char *)malloc(sizeof(char) * strlen(col[9]));
+		batt.comment = (char *)malloc(sizeof(char) * strlen(col[9]) + 1);
 		strcpy(batt.comment, col[9]);
 	} else {
 		batt.comment = NULL;
@@ -150,13 +161,15 @@ struct battery create_battery(char *col[10]) {
  */
 size_t battery_index(struct battery **index, const char *type) {
 	FILE *csvfile;
-	char filename[20];
+	char *filename;
 	char *line = NULL;
 	size_t len = 0;
 	size_t items = 0;
 	struct battery *batteries;
 
-	sprintf(filename, "%s/%s/%s", DATADIR, type, INDEXFILE);
+	size_t bsize = snprintf(NULL, 0, "%s/%s/%s", DATADIR, type, INDEXFILE) + 1;
+	filename = malloc(bsize);
+	snprintf(filename, bsize, "%s/%s/%s", DATADIR, type, INDEXFILE);
 	batteries = malloc((countlines(filename) - 1) * sizeof(struct battery));
 	csvfile = fopen(filename, "r");
 	if (csvfile == NULL) {
@@ -178,7 +191,7 @@ size_t battery_index(struct battery **index, const char *type) {
 		strtok(line, "\n");  // Remove the trailling newline.
 		token = strtok(line, ",");
 		while (token != NULL) {
-			col[cols] = (char *)malloc(sizeof(char) * strlen(token));
+			col[cols] = (char *)malloc(sizeof(char) * strlen(token) + 1);
 			strcpy(col[cols], token);
 
 			token = strtok(NULL, ",");
@@ -186,7 +199,7 @@ size_t battery_index(struct battery **index, const char *type) {
 		}		
 
 		if (cols != 10) {
-			printf("WARNING: Column number different than 10: %d\n", cols);
+			printf("ERROR: Column number different than 10: %d\n", cols);
 			for (int i = 0; i < cols; i++) {
 				printf("Col %d: %s\n", i, col[i]);
 			}
@@ -194,7 +207,7 @@ size_t battery_index(struct battery **index, const char *type) {
 			exit(EXIT_FAILURE);
 		}
 
-		batteries[items] = create_battery(col);
+		batteries[items] = create_battery(col, type);
 		
 		cols = 0;
 		items++;
@@ -203,3 +216,54 @@ size_t battery_index(struct battery **index, const char *type) {
 	*index = batteries;
 	return items;
 }
+
+/**
+ * Creates a array with the voltages during the discharge.
+ *
+ * @param batt Battery struct.
+ * @param voltages The array of voltages.
+ * @return Number of voltage readings in the array.
+ */
+size_t battery_discharge(const struct battery batt, float **voltages) {
+	FILE *csvfile;
+	char *filename;
+	char *line = NULL;
+	size_t len = 0;
+	size_t items = 0;
+	float *_voltages;
+
+	size_t bsize = snprintf(NULL, 0, "%s/%s/%s", DATADIR, batt.type, batt.file) + 1;
+	filename = malloc(bsize);
+	snprintf(filename, bsize, "%s/%s/%s", DATADIR, batt.type, batt.file);
+	_voltages = malloc(countlines(filename) * sizeof(float));
+
+	csvfile = fopen(filename, "r");
+	if (csvfile == NULL) {
+		printf("Couldn't open file: %s\n", filename);
+		exit(EXIT_FAILURE);
+	}
+	
+	while (getline(&line, &len, csvfile) != -1) {
+		char *token = NULL;
+		uint8_t col = 0;
+
+		strtok(line, "\n");  // Remove the trailling newline.
+		token = strtok(line, ",");
+		while (token != NULL) {
+			if (col == 2) {
+				_voltages[items] = atof(token);
+			}
+
+			token = strtok(NULL, ",");
+			col++;
+		}		
+
+		col = 0;
+		items++;
+	}
+
+	*voltages = _voltages;
+	return items;
+
+}
+
