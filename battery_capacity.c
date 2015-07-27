@@ -46,8 +46,6 @@ int main(int argc, const char *argv[]) {
 		printf("%s\n\n", batteries[i].file);
 	}
 
-	printf("%zu lines\n", countlines("data/9V/index.csv"));
-	
 	gnuplot_ctrl *gp = gnuplot_init();
 	gnuplot_cmd(gp, "load 'gnuplot.cfg'");
 	gnuplot_cmd(gp, "set key on");
@@ -259,17 +257,31 @@ size_t battery_discharge(const struct battery batt, double **voltages) {
 	while (getline(&line, &len, csvfile) != -1) {
 		char *token = NULL;
 		uint8_t col = 0;
+		bool finished = false;
 
 		strtok(line, "\n");  // Remove the trailling newline.
 		token = strtok(line, ",");
 		while (token != NULL) {
 			if (col == 2) {
-				_voltages[items] = atof(token);
+				double reading = atof(token);
+
+				if (reading < batt.cutoff) {
+					finished = true;
+				} else {
+					_voltages[items] = reading;
+				}
+
+				break;
 			}
 
 			token = strtok(NULL, ",");
 			col++;
-		}		
+		}
+
+		if (finished) {
+			_voltages = (double *)realloc(_voltages, items * sizeof(double));
+			break;
+		}
 
 		col = 0;
 		items++;
