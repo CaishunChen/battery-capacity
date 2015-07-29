@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <unistd.h>
+#include <math.h>
 #include "gnuplot_i/gnuplot_i.h"
 
 #define DATADIR "data"
@@ -35,31 +36,56 @@ char* battery_label(const struct battery batt);
 struct battery create_battery(char *col[10], const char *type);
 size_t battery_index(struct battery **index, const char *type);
 size_t battery_discharge(const struct battery batt, double **voltages);
-void plot_battery(gnuplot_ctrl *gp, const struct battery batt); 
+void plot_battery(gnuplot_ctrl *gp, const struct battery batt, double **mah_minmax, double **volt_minmax); 
 
 int main(int argc, const char *argv[]) {
 	struct battery *batteries;
-	size_t nitems = battery_index(&batteries, "9V");
+	size_t nitems = battery_index(&batteries, "AA");
 
-	for (int i = 0; i < nitems; i++) {
-		printf("%s\n", battery_label(batteries[i]));
-		printf("%s\n\n", batteries[i].file);
-	}
-
+	// Initialize GNUplot and configure it.
 	gnuplot_ctrl *gp = gnuplot_init();
 	gnuplot_cmd(gp, "load 'gnuplot.cfg'");
 	gnuplot_cmd(gp, "set key on");
 	gnuplot_set_xlabel(gp, "Capacity (mAh)");
 	gnuplot_set_ylabel(gp, "Voltage (V)");
 
+	// Plot batteries.
+	double xtics = 0;
+	double ytics = 0;
 	for (int i = 0; i < nitems; i++) {
+		double *mah_minmax = NULL;
+		double *volt_minmax = NULL;
+
 		if (batteries[i].show) {
-			plot_battery(gp, batteries[i]);
+			plot_battery(gp, batteries[i], &mah_minmax, &volt_minmax);
+			printf("mAh %.3f - %.3f | V %.3f - %.3f\n", mah_minmax[0], mah_minmax[1], volt_minmax[0], volt_minmax[1]);
+
+			if (mah_minmax[1] > xtics) {
+				xtics = mah_minmax[1];
+			}
+
+			if ((volt_minmax[0] - volt_minmax[1]) > ytics) {
+				ytics = volt_minmax[0] - volt_minmax[1];
+			}
 		}
 	}
 
-	sleep(5);
-	//pause();
+	xtics /= 18;
+	ytics /= 17;
+	printf("x = %.3f -> %d\n", xtics, (int)ceil(xtics));
+	printf("y = %.3f -> %.1f\n", ytics, ytics);
+
+	char set_tics[15];
+	snprintf(set_tics, 15, "set xtics %d", (int)ceil(xtics));
+	gnuplot_cmd(gp, set_tics);
+	if (ytics > 0.1) {
+		snprintf(set_tics, 15, "set ytics %.1f", ytics);
+		gnuplot_cmd(gp, set_tics);
+	}
+	gnuplot_cmd(gp, "replot");
+
+	printf("Press Enter to continue...");
+	getchar();
 	gnuplot_close(gp);
 
 	return EXIT_SUCCESS;
@@ -292,11 +318,15 @@ size_t battery_discharge(const struct battery batt, double **voltages) {
 
 }
 
-void plot_battery(gnuplot_ctrl *gp, const struct battery batt) {
+void plot_battery(gnuplot_ctrl *gp, const struct battery batt, double **mah_minmax, double **volt_minmax) {
 	double *voltages;
 	size_t nreads = battery_discharge(batt, &voltages);
 	double *mah;
 	mah = malloc(nreads * sizeof(double));
+
+	double *_mah_minmax = malloc(2 * sizeof(double));
+	double *_volt_minmax = malloc(2 * sizeof(double));
+
 
 	for (size_t i = 0; i < nreads; i++) {
 		mah[i] = batt.current * ((double)i / 3600);
@@ -304,5 +334,18 @@ void plot_battery(gnuplot_ctrl *gp, const struct battery batt) {
 	
 	gnuplot_setstyle(gp, "lines");
 	gnuplot_plot_xy(gp, mah, voltages, nreads, battery_label(batt));
+
+	if (mah_minmax != NULL) {
+		_mah_minmax[0] = mah[0];
+		_mah_minmax[1] = mah[nreads - 1];
+	}
+
+	if (volt_minmax != NULL) {
+		_volt_minmax[0] = voltages[0];
+		_volt_minmax[1] = voltages[nreads - 1];
+	}
+
+	*mah_minmax = _mah_minmax;
+	*volt_minmax = _volt_minmax;
 }
 

@@ -1,6 +1,6 @@
 CC = clang
 CXXFLAGS = -Wall
-LIBS = #-lreadline
+LIBS = -lm
 
 PROJECT = battery_capacity
 
