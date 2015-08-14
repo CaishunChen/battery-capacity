@@ -19,6 +19,6 @@ debug: $(PROJECT)
 	$(CC) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -r src/*.o
+	rm -r gnuplot_i/*.o
 	rm -r *.o
 	rm -r $(PROJECT)
