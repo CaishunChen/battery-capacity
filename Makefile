@@ -19,6 +19,17 @@ debug: $(PROJECT)
 	$(CC) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -r gnuplot_i/*.o
-	rm -r *.o
-	rm -r $(PROJECT)
+	# C Stuff.
+	-rm -r gnuplot_i/*.o
+	-rm -r *.o
+	-rm -r $(PROJECT)
+	-rm gnuplot_tmpdatafile_*
+	
+	# TeX Stuff.
+	-rm -r figure/
+	-rm report.pdf
+	-rm report.tex
+	-rm report.synctex.gz
+	-rm report-concordance.tex
+	-rm report.log
+	-rm framed.sty

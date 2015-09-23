@@ -1,0 +1,163 @@
+\documentclass[a4paper]{article}
+\usepackage[
+  margin=1.5cm,
+  includefoot,
+  footskip=30pt,
+]{geometry}
+\usepackage{layout}
+\usepackage{booktabs}
+
+\title{Battery Capacity Test}
+\date{\today}
+\author{Nathan Campos \\
+  \texttt{nathanpc@dreamintech.net}}
+
+\begin{document}
+
+% Title page.
+\begin{titlepage}
+  \maketitle
+\end{titlepage}
+
+<<results = 'asis', echo = FALSE, message = FALSE>>=
+  source("battery_capacity.R")
+@
+
+\section{Results}
+
+The results from the testing. Each section has a detailed explanation about each battery and also what was used to test them.
+
+
+
+
+\subsection{9V Batteries}
+
+The following batteries were tested using the manual method described in XXXXX. This table shows in details every aspect of the batteries tested:
+
+\begin{center}
+  \begin{tabular}{ c c c c c c p{4cm} }
+    \toprule
+    Brand & Model & Voltage & mAh & Current & Type & Comment \\
+    \midrule
+    <<results = 'asis', echo = FALSE, message = FALSE>>=
+      df_9v = get_batteries_df("9V")
+
+      for (i in 1:nrow(df_9v)) {
+        battery = df_9v[i,]
+        cat(sprintf("%s & %s & %.1f & %d & %d & %s & %s \\\\\n",
+                    battery$Brand, battery$Model, battery$Voltage,
+                    battery$Expected_Capacity, battery$Current,
+                    battery$Type, battery$Comment))
+      }
+    @
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\begin{center}
+<<echo = FALSE, message = FALSE, fig.height = 6, dpi = 100>>=
+  plot_batteries("9V")
+@
+\end{center}
+
+\pagebreak
+
+
+\subsection{AA Cells}
+
+The following cells were tested using the manual method described in XXXXX. This table shows in details every aspect of the cells tested:
+
+\begin{center}
+  \begin{tabular}{ c c c c c c p{4cm} }
+    \toprule
+    Brand & Model & Voltage & mAh & Current & Type & Comment \\
+    \midrule
+    <<results = 'asis', echo = FALSE, message = FALSE>>=
+      df_aa = get_batteries_df("AA")
+
+      for (i in 1:nrow(df_aa)) {
+        battery = df_aa[i,]
+        cat(sprintf("%s & %s & %.1f & %d & %d & %s & %s \\\\\n",
+                    battery$Brand, battery$Model, battery$Voltage,
+                    battery$Expected_Capacity, battery$Current,
+                    battery$Type, battery$Comment))
+      }
+    @
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\begin{center}
+<<echo = FALSE, message = FALSE, fig.height = 6, dpi = 100>>=
+  plot_batteries("AA")
+@
+\end{center}
+
+\pagebreak
+
+
+\subsection{AAA Cells}
+
+The following cells were tested using the manual method described in XXXXX. This table shows in details every aspect of the cells tested:
+
+\begin{center}
+  \begin{tabular}{ c c c c c c p{4cm} }
+    \toprule
+    Brand & Model & Voltage & mAh & Current & Type & Comment \\
+    \midrule
+    <<results = 'asis', echo = FALSE, message = FALSE>>=
+      df_aaa = get_batteries_df("AAA")
+
+      for (i in 1:nrow(df_aaa)) {
+        battery = df_aaa[i,]
+        cat(sprintf("%s & %s & %.1f & %d & %d & %s & %s \\\\\n",
+                    battery$Brand, battery$Model, battery$Voltage,
+                    battery$Expected_Capacity, battery$Current,
+                    battery$Type, battery$Comment))
+      }
+    @
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\begin{center}
+<<echo = FALSE, message = FALSE, fig.height = 6, dpi = 100>>=
+  plot_batteries("AAA")
+@
+\end{center}
+
+
+\pagebreak
+
+
+\subsection{18650 Cells}
+
+The following cells were tested using the manual method described in XXXXX. This table shows in details every aspect of the cells tested:
+
+\begin{center}
+  \begin{tabular}{ c c c c c c p{4cm} }
+    \toprule
+    Brand & Model & Voltage & mAh & Current & Type & Comment \\
+    \midrule
+    <<results = 'asis', echo = FALSE, message = FALSE>>=
+      df_18650 = get_batteries_df("18650")
+
+      for (i in 1:nrow(df_18650)) {
+        battery = df_18650[i,]
+        cat(sprintf("%s & %s & %.1f & %d & %d & %s & %s \\\\\n",
+                    battery$Brand, battery$Model, battery$Voltage,
+                    battery$Expected_Capacity, battery$Current,
+                    battery$Type, battery$Comment))
+      }
+    @
+    \bottomrule
+  \end{tabular}
+\end{center}
+
+\begin{center}
+<<echo = FALSE, message = FALSE, fig.height = 6, dpi = 100>>=
+  plot_batteries("18650")
+@
+\end{center}
+
+\end{document}
