@@ -35,6 +35,39 @@ battery_discharge <- function (name, file, current, cutoff) {
   return(data.frame(voltage = volts, mah = mah, name = name))
 }
 
+#' Get batteries by type and returns a data frame with information about each.
+#' 
+#' @param type Battery type.
+#' @return A list with the data frames with battery data from the index file.
+get_batteries_df <- function (type) {
+  csv = read.csv(paste(datadir, type, "index.csv", sep = "/"))
+  batts = data.frame(index = 1:nrow(csv))
+  delete = c()
+
+  for (i in 1:nrow(csv)) {
+    battery = csv[i,]
+    
+    if (battery$show == 1) {
+      batts$Brand[i] = sprintf("%s", battery$brand)
+      batts$Model[i] = sprintf("%s", battery$model)
+      batts$Voltage[i] = battery$voltage
+      batts$Expected_Capacity[i] = battery$exp_capacity
+      batts$Current[i] = battery$current
+      batts$Type[i] = sprintf("%s", battery$type)
+      batts$Comment[i] = sprintf("%s", battery$comment)
+    } else {
+      delete = c(delete, i)
+    }
+  }
+  
+  if (length(delete) > 0) {
+    batts = batts[-delete,]
+  }
+
+  batts$index = NULL
+  return(batts)
+}
+
 #' Get batteries data by type.
 #' 
 #' @param type Battery type.
@@ -56,9 +89,9 @@ get_batteries <- function (type, cached = TRUE) {
         capacity = battery$exp_capacity
         
         if (!is.na(model)) {
-          if (model != "") {
-            model = paste0(" ", model)
-          }
+          model = paste0(" ", model)
+        } else {
+          model = ""
         }
         
         if (!is.na(capacity)) {
