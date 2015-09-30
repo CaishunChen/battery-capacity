@@ -14,3 +14,12 @@ cache/
 # C Stuff.
 *.o
 battery_capacity
+
+# TeX Stuff.
+figure/
+*.sty
+*-concordance.tex
+report.log
+*.pdf
+*.synctex.gz
+*.tex
