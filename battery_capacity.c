@@ -40,7 +40,7 @@ void plot_battery(gnuplot_ctrl *gp, const struct battery batt, double **mah_minm
 
 int main(int argc, const char *argv[]) {
 	struct battery *batteries;
-	size_t nitems = battery_index(&batteries, "9V");
+	size_t nitems = battery_index(&batteries, "AA");
 
 	// Initialize GNUplot and configure it.
 	gnuplot_ctrl *gp = gnuplot_init();
