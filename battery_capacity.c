@@ -39,8 +39,13 @@ size_t battery_discharge(const struct battery batt, double **voltages);
 void plot_battery(gnuplot_ctrl *gp, const struct battery batt, double **mah_minmax, double **volt_minmax); 
 
 int main(int argc, const char *argv[]) {
+	if (argc < 2) {
+		printf("Usage: %s type\n", argv[0]);
+		exit(EXIT_FAILURE);
+	}
+
 	struct battery *batteries;
-	size_t nitems = battery_index(&batteries, "AA");
+	size_t nitems = battery_index(&batteries, argv[1]);
 
 	// Initialize GNUplot and configure it.
 	gnuplot_ctrl *gp = gnuplot_init();
