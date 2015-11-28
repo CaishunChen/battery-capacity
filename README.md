@@ -31,11 +31,15 @@ library("shiny")
 runApp(".")
 ```
 
-## AA
-
-![AA Discharge at 200mA](http://i.imgur.com/gtmotti.png)
-
 ## 9V
 
-![9V Discharge](http://i.imgur.com/GJLQqnI.png)
+![9V Discharge](https://raw.githubusercontent.com/nathanpc/battery-capacity/master/exports/9V-Capacity.jpeg)
+
+## AA
+
+![AA Discharge](https://raw.githubusercontent.com/nathanpc/battery-capacity/master/exports/AA-Capacity.jpeg)
+
+## AAA
+
+![AAA Discharge](https://raw.githubusercontent.com/nathanpc/battery-capacity/master/exports/AAA-Capacity.jpeg)
 
