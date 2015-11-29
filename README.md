@@ -31,6 +31,8 @@ library("shiny")
 runApp(".")
 ```
 
+If you want a much faster alternative you can build the C program by running `make` and then just executing the program with `./battery_capacity <type>`.
+
 ## 9V
 
 ![9V Discharge](https://raw.githubusercontent.com/nathanpc/battery-capacity/master/exports/9V-Capacity.jpeg)
