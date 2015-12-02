@@ -16,6 +16,7 @@
 
 #define DATADIR "data"
 #define INDEXFILE "index.csv"
+#define NCOLS 11
 
 struct battery {
 	char *type;
@@ -28,6 +29,7 @@ struct battery {
 	char *chem;
 	float cutoff;
 	char *file;
+	unsigned int interval;
 	char *comment;
 };
 
@@ -169,6 +171,7 @@ struct battery create_battery(char *col[10], const char *type) {
 	batt.cutoff = atof(col[7]);
 	batt.file = (char *)malloc(sizeof(char) * strlen(col[8]) + 1);
 	strcpy(batt.file, col[8]);
+	batt.interval = atoi(col[9]);
 	
 	if (strcmp(col[2], "NA") != 0) {
 		batt.model = (char *)malloc(sizeof(char) * strlen(col[2]) + 1);
@@ -183,9 +186,9 @@ struct battery create_battery(char *col[10], const char *type) {
 	}
 	batt.exp_capacity = exp_capacity;
 
-	if (strcmp(col[9], "NA") != 0) {
-		batt.comment = (char *)malloc(sizeof(char) * strlen(col[9]) + 1);
-		strcpy(batt.comment, col[9]);
+	if (strcmp(col[10], "NA") != 0) {
+		batt.comment = (char *)malloc(sizeof(char) * strlen(col[10]) + 1);
+		strcpy(batt.comment, col[10]);
 	} else {
 		batt.comment = NULL;
 	}
@@ -240,8 +243,8 @@ size_t battery_index(struct battery **index, const char *type) {
 			cols++;
 		}		
 
-		if (cols != 10) {
-			printf("ERROR: Column number different than 10: %d\n", cols);
+		if (cols != NCOLS) {
+			printf("ERROR: Column number different than %d: %d\n", NCOLS, cols);
 			for (int i = 0; i < cols; i++) {
 				printf("Col %d: %s\n", i, col[i]);
 			}
@@ -334,7 +337,7 @@ void plot_battery(gnuplot_ctrl *gp, const struct battery batt, double **mah_minm
 
 
 	for (size_t i = 0; i < nreads; i++) {
-		mah[i] = batt.current * ((double)i / 3600);
+		mah[i] = batt.current * ((i * batt.interval) / 3600.0);
 	}
 	
 	gnuplot_setstyle(gp, "lines");

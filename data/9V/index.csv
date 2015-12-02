@@ -1,9 +1,9 @@
-show,brand,model,voltage,exp_capacity,current,type,cutoff,file,comment,
-1,Rayovac,Recharge Plus,8.4,200,30,NiMH,6,Rayovac-RechargePlus-8.4V-200mAh.csv,NA,
-0,Rayovac,Recharge Plus,8.4,200,30,NiMH,6,Rayovac-RechargePlus-8.4V-200mAh-NotCharged.csv,Not fully charged,
-1,Hi-Watt,General Purpose,9,NA,20,6F22,6,Hi-Watt-6F22.csv,Written in the box: 20131010-20131025
-1,Powerex,NA,8.4,300,30,NiMH,6,Powerex-8.4V-300mAh-30mA.csv,NA,
-1,Powerex,NA,8.4,300,10,NiMH,6,Powerex-8.4V-300mAh-10mA.csv,NA,
-1,Powerex,NA,9.6,230,30,NiMH,6,Powerex-9.6V-230mAh-30mA.csv,NA,
-1,Duracell,Alkaline,9,NA,10,6LR61,6,Duracell-MN1604.csv,Valid Thru: Dec 2018,
-1,Elgin,Alkaline,9,NA,10,6LR61,6,Elgin-Alkaline-6LR61.csv,Valid Thru: Jan 2020,
+show,brand,model,voltage,exp_capacity,current,type,cutoff,file,interval,comment,
+1,Rayovac,Recharge Plus,8.4,200,30,NiMH,6,Rayovac-RechargePlus-8.4V-200mAh.csv,1,NA,
+0,Rayovac,Recharge Plus,8.4,200,30,NiMH,6,Rayovac-RechargePlus-8.4V-200mAh-NotCharged.csv,1,Not fully charged,
+1,Hi-Watt,General Purpose,9,NA,20,6F22,6,Hi-Watt-6F22.csv,1,Written in the box: 20131010-20131025
+1,Powerex,NA,8.4,300,30,NiMH,6,Powerex-8.4V-300mAh-30mA.csv,1,NA,
+1,Powerex,NA,8.4,300,10,NiMH,6,Powerex-8.4V-300mAh-10mA.csv,1,NA,
+1,Powerex,NA,9.6,230,30,NiMH,6,Powerex-9.6V-230mAh-30mA.csv,1,NA,
+1,Duracell,Alkaline,9,NA,10,6LR61,6,Duracell-MN1604.csv,1,Valid Thru: Dec 2018,
+1,Elgin,Alkaline,9,NA,10,6LR61,6,Elgin-Alkaline-6LR61.csv,1,Valid Thru: Jan 2020,

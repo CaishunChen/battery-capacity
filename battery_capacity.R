@@ -15,15 +15,16 @@ cachedir = "cache"
 #' @param file Log file location.
 #' @param current Discharge current.
 #' @param cutoff Voltage cutoff point to ignore when plotting.
+#' @param interval Sampling interval in seconds.
 #' @return A data frame with the battery data.
-battery_discharge <- function (name, file, current, cutoff) {
+battery_discharge <- function (name, file, current, cutoff, interval) {
   csv = read.csv(file, header = FALSE)
   volts = csv[[3]]
   mah = c()
 
   # Calculate the capacity and voltage at a point.
   for (i in 0:(length(volts) - 1)) {
-    mah = c(mah, current * (i / 3600))
+    mah = c(mah, current * ((i * interval) / 3600))
     
     # Stop appending data to the list when the cutoff point has been reached.
     if (i > 0 && volts[i] < cutoff) {
@@ -54,6 +55,7 @@ get_batteries_df <- function (type) {
       batts$Expected_Capacity[i] = battery$exp_capacity
       batts$Current[i] = battery$current
       batts$Type[i] = sprintf("%s", battery$type)
+      batts$Interval[i] = battery$interval
       batts$Comment[i] = sprintf("%s", battery$comment)
     } else {
       delete = c(delete, i)
@@ -105,7 +107,8 @@ get_batteries <- function (type, cached = TRUE) {
         batts[[length(batts) + 1]] = battery_discharge(name,
                                                        paste(datadir, type, battery$file, sep = "/"),
                                                        battery$current,
-                                                       battery$cutoff)
+                                                       battery$cutoff,
+                                                       battery$interval)
       }
     }
   }
