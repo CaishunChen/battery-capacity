@@ -5,6 +5,7 @@
 
 library("ggplot2")
 library("scales")
+library("RColorBrewer")
 rm(list = ls(all = TRUE))  # Clear the workspace.
 datadir <- "data"
 cachedir = "cache"
@@ -122,8 +123,12 @@ get_batteries <- function (type, cached = TRUE) {
 #' @param show Vector with the batteries (index in batts) to be shown in the graph.
 #' @seealso get_batteries
 plot_mah <- function (batts, show = 1:length(batts)) {
+  colourCount = length(show)
+  getPalette = colorRampPalette(brewer.pal(9, "Set1"))
+  
   graph = ggplot()
-  graph = graph + scale_colour_brewer(palette="Set1")
+  #graph = graph + scale_colour_brewer(palette="Set1")
+  graph + scale_fill_manual(values = getPalette(colourCount))
   graph = graph + theme(legend.title = element_blank(),
                         legend.justification = c(1, 1),
                         legend.position = c(1, 1))
